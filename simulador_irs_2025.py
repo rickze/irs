@@ -46,22 +46,23 @@ with col2:
     b_fatura = st.number_input("Exigência de Fatura", key="b_fatura")
     b_domestico = st.number_input("Trabalho Doméstico", key="b_domestico")
 
-st.header("3. Despesas com Dependentes (Individual)")
+st.header("3. Despesas com Dependentes (Individual por Bloco)")
 
+# Inicializar totais das despesas dos dependentes
 despesas_dep = {
     "gerais": 0, "saude": 0, "edu": 0,
     "imoveis": 0, "lares": 0, "fatura": 0, "domestico": 0
 }
 
 for i in range(1, int(num_dependentes) + 1):
-    with st.expander(f"Dependente {i}"):
-        gerais = st.number_input(f"Despesas Gerais - Dependente {i}", key=f"dep_{i}_gerais")
-        saude = st.number_input(f"Saúde - Dependente {i}", key=f"dep_{i}_saude")
-        edu = st.number_input(f"Educação - Dependente {i}", key=f"dep_{i}_edu")
-        imoveis = st.number_input(f"Encargos com Imóveis - Dependente {i}", key=f"dep_{i}_imoveis")
-        lares = st.number_input(f"Encargos com Lares - Dependente {i}", key=f"dep_{i}_lares")
-        fatura = st.number_input(f"Exigência de Fatura - Dependente {i}", key=f"dep_{i}_fatura")
-        domestico = st.number_input(f"Trabalho Doméstico - Dependente {i}", key=f"dep_{i}_domestico")
+    with st.expander(f"Despesas com Dependente {i}"):
+        gerais = st.number_input(f"Despesas Gerais - Dependente {i}", key=f"dep{i}_gerais")
+        saude = st.number_input(f"Saúde - Dependente {i}", key=f"dep{i}_saude")
+        edu = st.number_input(f"Educação - Dependente {i}", key=f"dep{i}_edu")
+        imoveis = st.number_input(f"Encargos com Imóveis - Dependente {i}", key=f"dep{i}_imoveis")
+        lares = st.number_input(f"Encargos com Lares - Dependente {i}", key=f"dep{i}_lares")
+        fatura = st.number_input(f"Exigência de Fatura - Dependente {i}", key=f"dep{i}_fatura")
+        domestico = st.number_input(f"Trabalho Doméstico - Dependente {i}", key=f"dep{i}_domestico")
 
         despesas_dep["gerais"] += gerais
         despesas_dep["saude"] += saude
@@ -77,7 +78,7 @@ def calcular_irs(rendimento, ss, despesas_dict, dep_dict):
     deducao_especifica = min(4462.15, ss)
     rendimento_coletavel = max(0, rendimento - deducao_especifica)
 
-    # Cálculo de deduções com limites por agregado
+    # Deduções com limites legais
     deducoes = 0
     deducoes += min(250, despesas_dict["gerais"] + dep_dict["gerais"])
     deducoes += min(1000, (despesas_dict["saude"] + dep_dict["saude"]) * 0.15)
