@@ -9,7 +9,7 @@ estado_civil = st.selectbox("Estado Civil", ["Solteiro(a)", "Casado(a)"])
 regime = st.selectbox("Regime de Tributação", ["Separada", "Conjunta"])
 num_dependentes = st.number_input("Número de Dependentes", min_value=0, step=1)
 
-st.header("2. Rendimentos e Retenções")
+st.header("2. Rendimentos e Despesas dos Titulares")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -26,7 +26,7 @@ with col1:
     a_edu = st.number_input("Educação e Formação", key="a_edu")
     a_imoveis = st.number_input("Encargos com Imóveis", key="a_imoveis")
     a_lares = st.number_input("Encargos com Lares", key="a_lares")
-    a_fatura = st.number_input("Exigência de Fatura (total)", key="a_fatura")
+    a_fatura = st.number_input("Exigência de Fatura", key="a_fatura")
     a_domestico = st.number_input("Trabalho Doméstico", key="a_domestico")
 
 with col2:
@@ -43,69 +43,59 @@ with col2:
     b_edu = st.number_input("Educação e Formação", key="b_edu")
     b_imoveis = st.number_input("Encargos com Imóveis", key="b_imoveis")
     b_lares = st.number_input("Encargos com Lares", key="b_lares")
-    b_fatura = st.number_input("Exigência de Fatura (total)", key="b_fatura")
+    b_fatura = st.number_input("Exigência de Fatura", key="b_fatura")
     b_domestico = st.number_input("Trabalho Doméstico", key="b_domestico")
 
-st.header("3. Despesas com Dependentes")
-dep_saude = st.number_input("Saúde e Seguros de Saúde dos Dependentes")
-dep_edu = st.number_input("Educação e Formação dos Dependentes")
-dep_lares = st.number_input("Encargos com Lares dos Dependentes")
+st.header("3. Despesas com Dependentes (Total)")
+
+dep_gerais = st.number_input("Despesas Gerais Familiares")
+dep_saude = st.number_input("Saúde e Seguros de Saúde")
+dep_edu = st.number_input("Educação e Formação")
+dep_imoveis = st.number_input("Encargos com Imóveis")
+dep_lares = st.number_input("Encargos com Lares")
+dep_fatura = st.number_input("Exigência de Fatura")
+dep_domestico = st.number_input("Trabalho Doméstico")
 
 st.header("4. Resultado da Simulação")
 
-def calcular_irs(rendimento, ss, despesas_dict, ded_dependentes):
+def calcular_irs(rendimento, ss, despesas_dict, dep_dict):
     deducao_especifica = min(4462.15, ss)
     rendimento_coletavel = max(0, rendimento - deducao_especifica)
 
-    # Cálculo de deduções com limites
+    # Cálculo de deduções com limites por agregado
     deducoes = 0
-    deducoes += min(250, despesas_dict["gerais"])
-    deducoes += min(1000, (despesas_dict["saude"] + ded_dependentes["saude"]) * 0.15)
-    deducoes += min(800, (despesas_dict["edu"] + ded_dependentes["edu"]) * 0.30)
-    deducoes += min(700, despesas_dict["imoveis"] * 0.15)
-    deducoes += min(403.75, (despesas_dict["lares"] + ded_dependentes["lares"]) * 0.25)
-    deducoes += min(250, despesas_dict["fatura"] * 0.15)
-    deducoes += min(200, despesas_dict["domestico"] * 0.35)
+    deducoes += min(250, despesas_dict["gerais"] + dep_dict["gerais"])
+    deducoes += min(1000, (despesas_dict["saude"] + dep_dict["saude"]) * 0.15)
+    deducoes += min(800, (despesas_dict["edu"] + dep_dict["edu"]) * 0.30)
+    deducoes += min(700, (despesas_dict["imoveis"] + dep_dict["imoveis"]) * 0.15)
+    deducoes += min(403.75, (despesas_dict["lares"] + dep_dict["lares"]) * 0.25)
+    deducoes += min(250, (despesas_dict["fatura"] + dep_dict["fatura"]) * 0.15)
+    deducoes += min(200, (despesas_dict["domestico"] + dep_dict["domestico"]) * 0.35)
 
-    # Coleta bruta simplificada com taxa média
     coleta = rendimento_coletavel * 0.23
     coleta_liquida = max(0, coleta - deducoes)
     return rendimento_coletavel, coleta_liquida
 
-# Dados Titular A
+# Dados dos titulares
 rendimento_a = a_cat_a + a_cat_b + a_outras
-despesas_a = {
-    "gerais": a_gerais,
-    "saude": a_saude,
-    "edu": a_edu,
-    "imoveis": a_imoveis,
-    "lares": a_lares,
-    "fatura": a_fatura,
-    "domestico": a_domestico
-}
-
-# Dados Titular B
 rendimento_b = b_cat_a + b_cat_b + b_outras
-despesas_b = {
-    "gerais": b_gerais,
-    "saude": b_saude,
-    "edu": b_edu,
-    "imoveis": b_imoveis,
-    "lares": b_lares,
-    "fatura": b_fatura,
-    "domestico": b_domestico
-}
 
-# Deduções com dependentes
-dep_deducoes = {
-    "saude": dep_saude,
-    "edu": dep_edu,
-    "lares": dep_lares
+despesas_a = {
+    "gerais": a_gerais, "saude": a_saude, "edu": a_edu,
+    "imoveis": a_imoveis, "lares": a_lares, "fatura": a_fatura, "domestico": a_domestico
+}
+despesas_b = {
+    "gerais": b_gerais, "saude": b_saude, "edu": b_edu,
+    "imoveis": b_imoveis, "lares": b_lares, "fatura": b_fatura, "domestico": b_domestico
+}
+despesas_dep = {
+    "gerais": dep_gerais, "saude": dep_saude, "edu": dep_edu,
+    "imoveis": dep_imoveis, "lares": dep_lares, "fatura": dep_fatura, "domestico": dep_domestico
 }
 
 # Separado
-rc_a, cl_a = calcular_irs(rendimento_a, a_ss, despesas_a, dep_deducoes)
-rc_b, cl_b = calcular_irs(rendimento_b, b_ss, despesas_b, dep_deducoes)
+rc_a, cl_a = calcular_irs(rendimento_a, a_ss, despesas_a, despesas_dep)
+rc_b, cl_b = calcular_irs(rendimento_b, b_ss, despesas_b, despesas_dep)
 ret_total = a_ret + b_ret
 cl_total = cl_a + cl_b
 saldo_sep = ret_total - cl_total
@@ -114,10 +104,10 @@ saldo_sep = ret_total - cl_total
 rendimento_total = rendimento_a + rendimento_b
 ss_total = a_ss + b_ss
 despesas_total = {k: despesas_a[k] + despesas_b[k] for k in despesas_a}
-rc_conj, cl_conj = calcular_irs(rendimento_total, ss_total, despesas_total, dep_deducoes)
+rc_conj, cl_conj = calcular_irs(rendimento_total, ss_total, despesas_total, despesas_dep)
 saldo_conj = ret_total - cl_conj
 
-# Apresentar Resultados
+# Resultado
 st.subheader("Resultados:")
 
 col1, col2 = st.columns(2)
