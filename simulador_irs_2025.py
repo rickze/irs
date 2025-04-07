@@ -46,15 +46,30 @@ with col2:
     b_fatura = st.number_input("Exigência de Fatura", key="b_fatura")
     b_domestico = st.number_input("Trabalho Doméstico", key="b_domestico")
 
-st.header("3. Despesas com Dependentes (Total)")
+st.header("3. Despesas com Dependentes (Individual)")
 
-dep_gerais = st.number_input("Despesas Gerais Familiares")
-dep_saude = st.number_input("Saúde e Seguros de Saúde")
-dep_edu = st.number_input("Educação e Formação")
-dep_imoveis = st.number_input("Encargos com Imóveis")
-dep_lares = st.number_input("Encargos com Lares")
-dep_fatura = st.number_input("Exigência de Fatura")
-dep_domestico = st.number_input("Trabalho Doméstico")
+despesas_dep = {
+    "gerais": 0, "saude": 0, "edu": 0,
+    "imoveis": 0, "lares": 0, "fatura": 0, "domestico": 0
+}
+
+for i in range(1, int(num_dependentes) + 1):
+    with st.expander(f"Dependente {i}"):
+        gerais = st.number_input(f"Despesas Gerais - Dependente {i}", key=f"dep_{i}_gerais")
+        saude = st.number_input(f"Saúde - Dependente {i}", key=f"dep_{i}_saude")
+        edu = st.number_input(f"Educação - Dependente {i}", key=f"dep_{i}_edu")
+        imoveis = st.number_input(f"Encargos com Imóveis - Dependente {i}", key=f"dep_{i}_imoveis")
+        lares = st.number_input(f"Encargos com Lares - Dependente {i}", key=f"dep_{i}_lares")
+        fatura = st.number_input(f"Exigência de Fatura - Dependente {i}", key=f"dep_{i}_fatura")
+        domestico = st.number_input(f"Trabalho Doméstico - Dependente {i}", key=f"dep_{i}_domestico")
+
+        despesas_dep["gerais"] += gerais
+        despesas_dep["saude"] += saude
+        despesas_dep["edu"] += edu
+        despesas_dep["imoveis"] += imoveis
+        despesas_dep["lares"] += lares
+        despesas_dep["fatura"] += fatura
+        despesas_dep["domestico"] += domestico
 
 st.header("4. Resultado da Simulação")
 
@@ -87,10 +102,6 @@ despesas_a = {
 despesas_b = {
     "gerais": b_gerais, "saude": b_saude, "edu": b_edu,
     "imoveis": b_imoveis, "lares": b_lares, "fatura": b_fatura, "domestico": b_domestico
-}
-despesas_dep = {
-    "gerais": dep_gerais, "saude": dep_saude, "edu": dep_edu,
-    "imoveis": dep_imoveis, "lares": dep_lares, "fatura": dep_fatura, "domestico": dep_domestico
 }
 
 # Separado
